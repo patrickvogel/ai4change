@@ -24,13 +24,13 @@ export class ProductListService {
     const context = this;
     const pullParams = {
       FunctionName : 'ProductListDummy',
-      InvocationType : 'RequestResponse',
-      LogType : 'None'
+      Payload: JSON.stringify({var1: 'woopwoop'})
     };
     this.lambda.invoke(pullParams, function(error, data) {
       if (!error) {
         this.pullResults = JSON.parse(data.Payload);
         context.subject.next(this.pullResults.products);
+        console.log(this.pullResults);
       }
     });
   };
