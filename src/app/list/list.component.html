@@ -1,11 +1,11 @@
 <div class="row">
   <div class="col-md-12">
     <h5>
-    <span *ngFor="let stockCode of selectedStockCodes" class="badge badge-default badge-padding" (click)="deselectStockCode(stockCode)">
-      {{stockCode}}
-      <i class="fa fa-close" aria-hidden="true"></i>
-    </span>
-  </h5>
+      <span *ngFor="let stockCode of selectedStockCodes" class="badge badge-default badge-padding" (click)="deselectStockCode(stockCode)">
+        {{stockCode}}
+        <i class="fa fa-close" aria-hidden="true"></i>
+      </span>
+    </h5>
   </div>
 </div>
 
@@ -50,20 +50,15 @@
               (click)="deselectStockCode(data.id)">Remove</button>
           </th>
         </tr>
-
-        <tr>
-          <th colspan="3">
-            <button *ngIf="resultSize<filteredSize" type="button" class="btn btn-outline-indigo btn-sm m-0 fix-left"
-              (click)="addResults();">Show more</button>
-            &nbsp;
-            <button *ngIf="resultSize>5 && filteredSize>5" type="button" class="btn btn-outline-indigo btn-sm m-0 fix-right"
-              (click)="removeResults();">Show less</button>
-          </th>
-        </tr>
-
       </tbody>
       <!--Table body-->
     </table>
+
+    <button *ngIf="resultSize<filteredSize" type="button" class="btn btn-outline-indigo btn-sm m-0 fix-left" (click)="addResults();">Show
+      more</button>
+    &nbsp;
+    <button *ngIf="resultSize>5 && filteredSize>5" type="button" class="btn btn-outline-indigo btn-sm m-0 fix-right"
+      (click)="removeResults();">Show less</button>
 
     <!--Table-->
   </div>

@@ -35,7 +35,7 @@ export class ListComponent implements OnInit {
   filterIt(arr, searchKey) {
     return arr.filter((obj) => {
       return Object.keys(obj).some((key) => {
-        return obj[key].includes(searchKey);
+        return obj[key].toUpperCase().includes(searchKey.toUpperCase());
       });
     });
   }
