@@ -20,10 +20,20 @@ export class ListComponent implements OnInit {
 
   productListService = new ProductListService();
 
+  compare(a, b) {
+    if (a.name.trim().toUpperCase() < b.name.trim().toUpperCase()) {
+      return -1;
+    }
+    if (a.name.trim().toUpperCase() > b.name.trim().toUpperCase()) {
+      return 1;
+    }
+    return 0;
+  }
+
   constructor() {
     this.productListService.getProducts()
          .subscribe(products => {
-            this.tableData = products;
+            this.tableData = products.sort(this.compare);
             this.dataInit = true;
             this.search();
          });
@@ -33,9 +43,15 @@ export class ListComponent implements OnInit {
   }
 
   filterIt(arr, searchKey) {
+    const searchArray = searchKey.toUpperCase().split(' ');
     return arr.filter((obj) => {
       return Object.keys(obj).some((key) => {
-        return obj[key].toUpperCase().includes(searchKey.toUpperCase());
+        for (let searchTerm of searchArray){
+          if (!obj[key].trim().toUpperCase().includes(searchTerm)){
+            return false;
+          }
+        }
+        return true;
       });
     });
   }
@@ -66,6 +82,12 @@ export class ListComponent implements OnInit {
 
   deselectStockCode(stockcode) {
     this.selectedStockCodes = this.selectedStockCodes.filter(function(e) { return e !== stockcode; });
+  }
+
+  getNameByStockCode(stockcode) {
+    return this.tableData.filter(obj => {
+      return obj.id === stockcode;
+    })[0].name;
   }
 
 }
