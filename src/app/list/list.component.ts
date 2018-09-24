@@ -1,6 +1,6 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { ProductListService } from '../product-list.service';
-
+import { ProductsService } from '../services/products.service';
+import { SelectionService } from '../services/selection.service';
 
 
 @Component({
@@ -18,14 +18,30 @@ export class ListComponent implements OnInit {
   dataInit = false;
   selectedStockCodes = [];
 
-  productListService = new ProductListService();
+  public stockCodes = [];
 
-  constructor() {
-    this.productListService.getProducts()
+  compare(a, b) {
+    if (a.name.trim().toUpperCase() < b.name.trim().toUpperCase()) {
+      return -1;
+    }
+    if (a.name.trim().toUpperCase() > b.name.trim().toUpperCase()) {
+      return 1;
+    }
+    return 0;
+  }
+
+  constructor(private productService: ProductsService, private selectionService: SelectionService) {
+    this.productService.getProducts()
          .subscribe(products => {
-            this.tableData = products;
+            this.tableData = products.sort(this.compare);
             this.dataInit = true;
             this.search();
+         });
+
+         this.selectionService.getSelection()
+         .subscribe(stockCodes => {
+          console.log('neue StockCodes');
+            this.stockCodes = stockCodes;
          });
   }
 
@@ -33,9 +49,15 @@ export class ListComponent implements OnInit {
   }
 
   filterIt(arr, searchKey) {
+    const searchArray = searchKey.toUpperCase().split(' ');
     return arr.filter((obj) => {
       return Object.keys(obj).some((key) => {
-        return obj[key].toUpperCase().includes(searchKey.toUpperCase());
+        for (let searchTerm of searchArray){
+          if (!obj[key].trim().toUpperCase().includes(searchTerm)){
+            return false;
+          }
+        }
+        return true;
       });
     });
   }
@@ -62,10 +84,18 @@ export class ListComponent implements OnInit {
 
   selectStockCode(stockcode) {
     this.selectedStockCodes.push(stockcode);
+    this.selectionService.setSelection(this.selectedStockCodes);
   }
 
   deselectStockCode(stockcode) {
     this.selectedStockCodes = this.selectedStockCodes.filter(function(e) { return e !== stockcode; });
+    this.selectionService.setSelection(this.selectedStockCodes);
+  }
+
+  getNameByStockCode(stockcode) {
+    return this.tableData.filter(obj => {
+      return obj.id === stockcode;
+    })[0].name;
   }
 
 }
