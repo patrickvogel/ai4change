@@ -6,7 +6,7 @@ const AWS = require('aws-sdk');
 @Injectable({
   providedIn: 'root'
 })
-export class ProductListService {
+export class ProductsService {
 
   private lambda;
   public subject = new Subject<any>();
@@ -30,7 +30,6 @@ export class ProductListService {
       if (!error) {
         this.pullResults = JSON.parse(data.Payload);
         context.subject.next(this.pullResults.products);
-        console.log(this.pullResults);
       }
     });
   };

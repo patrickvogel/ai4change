@@ -6,20 +6,27 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { ListComponent } from './list/list.component';
+import { ChartComponent } from './chart/chart.component';
+import { ProductsService } from './services/products.service';
+import { SelectionService } from './services/selection.service';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    ListComponent
+    ListComponent,
+    ChartComponent
   ],
   imports: [
     BrowserModule,
     MDBBootstrapModule.forRoot(),
     FormsModule
   ],
-  providers: [],
+  providers: [
+    ProductsService,
+    SelectionService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

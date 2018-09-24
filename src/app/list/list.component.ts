@@ -1,6 +1,6 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { ProductListService } from '../product-list.service';
-
+import { ProductsService } from '../services/products.service';
+import { SelectionService } from '../services/selection.service';
 
 
 @Component({
@@ -18,7 +18,7 @@ export class ListComponent implements OnInit {
   dataInit = false;
   selectedStockCodes = [];
 
-  productListService = new ProductListService();
+  public stockCodes = [];
 
   compare(a, b) {
     if (a.name.trim().toUpperCase() < b.name.trim().toUpperCase()) {
@@ -30,12 +30,18 @@ export class ListComponent implements OnInit {
     return 0;
   }
 
-  constructor() {
-    this.productListService.getProducts()
+  constructor(private productService: ProductsService, private selectionService: SelectionService) {
+    this.productService.getProducts()
          .subscribe(products => {
             this.tableData = products.sort(this.compare);
             this.dataInit = true;
             this.search();
+         });
+
+         this.selectionService.getSelection()
+         .subscribe(stockCodes => {
+          console.log('neue StockCodes');
+            this.stockCodes = stockCodes;
          });
   }
 
@@ -78,10 +84,12 @@ export class ListComponent implements OnInit {
 
   selectStockCode(stockcode) {
     this.selectedStockCodes.push(stockcode);
+    this.selectionService.setSelection(this.selectedStockCodes);
   }
 
   deselectStockCode(stockcode) {
     this.selectedStockCodes = this.selectedStockCodes.filter(function(e) { return e !== stockcode; });
+    this.selectionService.setSelection(this.selectedStockCodes);
   }
 
   getNameByStockCode(stockcode) {
