@@ -2,14 +2,12 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { ProductsService } from '../services/products.service';
 import { SelectionService } from '../services/selection.service';
 
-
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent implements OnInit {
-
   public tableData = [];
 
   searchText: string;
@@ -17,8 +15,18 @@ export class ListComponent implements OnInit {
   filteredSize = 0;
   dataInit = false;
   selectedStockCodes = [];
+  selectedProducts = [];
+  selectedStockCode;
 
   public stockCodes = [];
+
+  weeks = [];
+  weekSelection;
+  yearSelection;
+  weekSales = [0, 0, 0];
+
+  weekDates = [new Date(), new Date(), new Date(), new Date(), new Date(), new Date(), new Date()];
+  weekNames = ['', '', '', '', '', '', ''];
 
   compare(a, b) {
     if (a.name.trim().toUpperCase() < b.name.trim().toUpperCase()) {
@@ -30,30 +38,39 @@ export class ListComponent implements OnInit {
     return 0;
   }
 
-  constructor(private productService: ProductsService, private selectionService: SelectionService) {
-    this.productService.getProducts()
-         .subscribe(products => {
-            this.tableData = products.sort(this.compare);
-            this.dataInit = true;
-            this.search();
-         });
+  constructor(
+    private productService: ProductsService,
+    private selectionService: SelectionService
+  ) {
+    for (let i = 1; i <= 52; i++) {
+      this.weeks.push(i);
+    }
+    this.initializeDates();
 
-         this.selectionService.getSelection()
-         .subscribe(stockCodes => {
-          console.log('neue StockCodes');
-            this.stockCodes = stockCodes;
-         });
+    this.productService.getProducts().subscribe(products => {
+      this.tableData = products.sort(this.compare);
+      this.dataInit = true;
+      this.search();
+    });
+
+    this.selectionService.getSelection().subscribe(stockCodes => {
+      this.stockCodes = stockCodes;
+    });
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   filterIt(arr, searchKey) {
     const searchArray = searchKey.toUpperCase().split(' ');
-    return arr.filter((obj) => {
-      return Object.keys(obj).some((key) => {
-        for (let searchTerm of searchArray){
-          if (!obj[key].trim().toUpperCase().includes(searchTerm)){
+    return arr.filter(obj => {
+      return Object.keys(obj).some(key => {
+        for (const searchTerm of searchArray) {
+          if (
+            !obj[key]
+              .trim()
+              .toUpperCase()
+              .includes(searchTerm)
+          ) {
             return false;
           }
         }
@@ -82,20 +99,88 @@ export class ListComponent implements OnInit {
     this.resultSize -= 5;
   }
 
-  selectStockCode(stockcode) {
-    this.selectedStockCodes.push(stockcode);
-    this.selectionService.setSelection(this.selectedStockCodes);
+  selectProduct(stockcode) {
+    this.selectedStockCode = stockcode;
   }
 
-  deselectStockCode(stockcode) {
-    this.selectedStockCodes = this.selectedStockCodes.filter(function(e) { return e !== stockcode; });
-    this.selectionService.setSelection(this.selectedStockCodes);
+  deselectProduct(stockcode) {
+    this.selectedProducts = this.selectedProducts.filter(function(e) {
+      return e.id !== stockcode;
+    });
+    this.selectedStockCodes = this.selectedStockCodes.filter(function(e) {
+      return e !== stockcode;
+    });
+
+    this.selectionService.setSelection(this.selectedProducts);
   }
 
   getNameByStockCode(stockcode) {
-    return this.tableData.filter(obj => {
-      return obj.id === stockcode;
-    })[0].name;
+    try {
+      return this.tableData.filter(obj => {
+        return obj.id === stockcode;
+      })[0].name;
+    } catch {
+      return '';
+    }
   }
 
+  getWeekNumber = function(date: Date): number {
+    const d: any = new Date(
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+    );
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart: any = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+  };
+
+  updateWeekSelection() {
+    const d = 1 + (this.weekSelection - 1) * 7; 
+    this.weekDates[3] = new Date(this.yearSelection, 0, d);
+
+    for (let i = 2; i >= 0; i--) {
+      this.weekDates[i] = new Date(this.weekDates[i + 1]);
+      this.weekDates[i].setDate(this.weekDates[i].getDate() - 7);
+    }
+
+    for (let i = 4; i <= 6; i++) {
+      this.weekDates[i] = new Date(this.weekDates[i - 1]);
+      this.weekDates[i].setDate(this.weekDates[i].getDate() + 7);
+    }
+
+    for(let i = 0; i <= 6; i++) {
+      this.weekNames[i] = this.getWeekNumber(this.weekDates[i]) 
+                          + '/'
+                          + this.weekDates[i].getFullYear().toString().substr(-2);
+    }
+  }
+
+  clearWeekAmounts() {
+    this.weekSales = [0, 0, 0];
+  }
+
+  initializeDates() {
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
+    this.weekSelection = this.getWeekNumber(nextWeek);
+    this.yearSelection = nextWeek.getFullYear();
+
+    this.updateWeekSelection();
+  }
+
+  addProduct() {
+
+    this.selectedProducts.push({
+      id: this.selectedStockCode,
+      name: this.getNameByStockCode(this.selectedStockCode),
+      date: this.weekDates[0],
+      amounts: this.weekSales,
+      forecastLabels: this.weekNames
+    });
+    this.selectedStockCodes.push (this.selectedStockCode);
+
+    this.selectionService.setSelection(this.selectedProducts);
+    this.clearWeekAmounts();
+  }
 }

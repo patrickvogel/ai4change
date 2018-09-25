@@ -13,11 +13,11 @@ export class ProductsService {
 
   constructor() {
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-      IdentityPoolId: 'us-east-2:95142ff3-74c6-4641-a2d7-9ff4161ab981',
+      IdentityPoolId: 'eu-central-1:0e9ef61e-e9e9-4f61-9863-caa0ac610ff4',
       Logins: { /* optional tokens, used for authenticated login */ }
     });
-    AWS.config.update({region: 'us-east-2'})
-    this.lambda = new AWS.Lambda({region: 'us-east-2', apiVersion: '2018-09-18'});
+    AWS.config.update({region: 'eu-central-1'})
+    this.lambda = new AWS.Lambda({region: 'eu-central-1', apiVersion: '2018-09-18'});
   }
 
   private lambdaMagic = function() {
