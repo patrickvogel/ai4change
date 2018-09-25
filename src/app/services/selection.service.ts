@@ -13,8 +13,6 @@ export class SelectionService {
 
   setSelection(selectedProducts) {
     this.subject.next(selectedProducts);
-    console.log('set');
-    console.log(selectedProducts);
   }
 
   getSelection(): Observable<any> {

@@ -1,11 +1,8 @@
-<div class="row">
-  <div class="card col-md-12">
-      <div style="display: block">
-          <canvas mdbChart [chartType]="chartType" [datasets]="chartDatasets" [labels]="chartLabels"
-              [colors]="chartColors" [options]="chartOptions" [legend]="true" (chartHover)="chartHovered($event)"
-              (chartClick)="chartClicked($event)">
-          </canvas>
-      </div>
-  </div>
+<div *ngFor="let product of products; let i = index" class="row">
+    <div class="card col-md-12 chart-box">
+        <h5>{{products[i].id}}: {{products[i].name}}</h5>
+        <div style="display: block">
+            <canvas id="chart{{i}}"></canvas>
+        </div>
+    </div>
 </div>
-{{stockCodesStr}}
