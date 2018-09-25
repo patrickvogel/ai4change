@@ -33,7 +33,8 @@ export class ChartComponent implements OnInit {
    updateCharts() {
 
        for(let i = 0; i < this.products.length; i++) {
-        const ctx = document.getElementById('chart' + i).getContext('2d');
+        const canvas = <HTMLCanvasElement> document.getElementById('chart' + i);
+        const ctx = canvas.getContext('2d');
         const myChart = new Chart(ctx, {
             type: 'bar',
             data: {
