@@ -175,8 +175,8 @@ export class ListComponent implements OnInit {
       id: this.selectedStockCode,
       name: this.getNameByStockCode(this.selectedStockCode),
       date: this.weekDates[0],
-      amounts: this.weekSales,
-      forecastLabels: this.weekNames
+      amounts: JSON.parse(JSON.stringify(this.weekSales)),
+      forecastLabels: JSON.parse(JSON.stringify(this.weekNames))
     });
     this.selectedStockCodes.push (this.selectedStockCode);
 
