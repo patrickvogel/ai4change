@@ -16,6 +16,7 @@ export class ChartComponent implements OnInit {
 
   products;
   forecast;
+  charts: Chart[] = [];
 
   constructor(private selectionService: SelectionService, private forecastService: ForecastService) {
     this.selectionService.getSelection()
@@ -31,11 +32,16 @@ export class ChartComponent implements OnInit {
    }
 
    updateCharts() {
+        for (let i = 0; i < this.charts.length; i++) {
+            this.charts[i].destroy();
+        }
+        this.charts = [];
 
-       for(let i = 0; i < this.products.length; i++) {
+       for (let i = 0; i < this.products.length; i++) {
         const canvas = <HTMLCanvasElement> document.getElementById('chart' + i);
         const ctx = canvas.getContext('2d');
-        const myChart = new Chart(ctx, {
+
+        this.charts[i] = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: this.products[i].forecastLabels,

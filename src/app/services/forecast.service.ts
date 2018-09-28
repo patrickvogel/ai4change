@@ -43,6 +43,16 @@ export class ForecastService {
     this.lambda.invoke(pullParams, function(error, data) {
       if (!error) {
         this.pullResults = JSON.parse(data.Payload);
+
+        for (let i = 0; i < this.pullResults.predictions.length; i++){
+          for (let j = 0; j < this.pullResults.predictions[i].mean.length; j++){
+            this.pullResults.predictions[i].mean[j] = Math.round(this.pullResults.predictions[i].mean[j]);
+            if (this.pullResults.predictions[i].mean[j] < 0){
+              this.pullResults.predictions[i].mean[j] = 0;
+            }
+          }
+        }
+
         context.subject.next(this.pullResults);
       }
     });
